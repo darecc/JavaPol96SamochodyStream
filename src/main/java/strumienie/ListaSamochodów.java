@@ -176,19 +176,50 @@ public class ListaSamochodów {
 
         //endregion
         //region obliczenie średniego wieku pojazdów
+        double averageAge = samochody.stream().mapToDouble(a -> 2021 - a.getRokProdukcji()).average().getAsDouble();
+        System.out.println("Średni wiek pojazdów to : " + averageAge);
         //endregion
         // samochody pogrupowane wg pojemności w przedziałach
+        Map<Integer, List<Samochód>> carMap = samochody.stream().collect(Collectors.groupingBy(Samochód::getPojemnoscWPrzedziale));
+        for ( Map.Entry<Integer,List<Samochód>> entry:carMap.entrySet()) {
+            System.out.println("Przedział od " + entry.getKey()*Samochód.wielkoscPrzedzialu);
+            for (Samochód s : entry.getValue())
+                System.out.println("\t" + s.toString());
+        }
         //region średnia cena samochodu o pojemności z przedziału (1500,2000) i roku produkcji > 2010
+        Predicate<Samochód> filtrPojemności = (p) -> (p.getPojemnośćSilnika() > 1500 && p.getPojemnośćSilnika() < 2000);
+        Predicate<Samochód> filtrRokuProdukcji = (p) -> p.getRokProdukcji() > 2010;
+
+        double averagePriceAfter2010 = samochody.stream().filter(filtrPojemności).filter(filtrRokuProdukcji)
+                .mapToDouble(p ->p.getCena()).average().getAsDouble();
+        System.out.println("Średnia cena aut wyprodukowanych po 2010 roku to " + averagePriceAfter2010);
         //endregion
         // region samochody posortowane wg średniego rocznego przebiegu
+
+        List<Samochód> averageMileage = samochody.stream().sorted(new AverageMileageCoparator()).collect(Collectors.toList());
+        System.out.println("Samochody posortowane według rocznego przebiegu :");
+        for (Samochód s : averageMileage){
+            System.out.println("Auto : " + s.getMarka() +" " + s.getModel() + " Roczny przebieg : " + s.getRocznyPrzebieg());
+        }
+
         //endregion
         // region samochody posortowane wg ceny podzielonej przez liczbę lat
         //endregion
         //region wydobycie samych cen samochodów
+        List<Double> priceOfCars = samochody.stream().map(p->p.getCena()).collect(Collectors.toList());
+        System.out.println(priceOfCars);
         //endregion
-        //TODO: wydobycie pary: marka + cena
+        //region wydobycie Marki i ceny wszystkich samochodów
+        List<Para<String,Double>> markaICena = samochody.stream().map(p->p.getParaZCeną()).collect(Collectors.toList());
+        for (Para<String,Double> p: markaICena){
+            System.out.println(p.getElement1() +" " + p.getElement2());
+        }
+        //endregion
         //region wydobycie pary: marka + PRZEBIEG ROCZNY i posortowanie wg przebiegu rocznego
-        System.out.println("==== SAMOCHODY POSORTOWANE WG PRZEBIEGU ROCZNEGO ====");
+        List<Para<String,Double>> markaIPrzebieg = samochody.stream().sorted(new AverageMileageCoparator())
+                .map(p->p.getPara()).collect(Collectors.toList());
+        for(Para<String,Double> p : markaIPrzebieg)
+        System.out.println(p.getElement1() + " " + p.getElement2());
         //endregion
         // region wydobycie tripletu marka+model, rok produkcji, przebieg roczny
         /*

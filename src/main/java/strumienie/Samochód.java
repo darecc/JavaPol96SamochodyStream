@@ -21,6 +21,17 @@ public class Samochód {
         return pojemnośćSilnika;
     }
 
+    public static final int wielkoscPrzedzialu = 1000;
+
+    public int getRocznyPrzebieg(){
+        int rocznyPrzebieg =przebieg/((LocalDate.now().getYear()+1) - rokProdukcji);
+        return  rocznyPrzebieg;
+    }
+
+    public int getPojemnoscWPrzedziale(){
+        return  pojemnośćSilnika/Samochód.wielkoscPrzedzialu;
+    }
+
     public double getCena() {
         return cena;
     }
@@ -46,6 +57,10 @@ public class Samochód {
     }
     public Para<String, Double> getPara() {
         Para<String, Double> para = new Para(this.toString(), przebieg/(LocalDate.now().getYear()- rokProdukcji+1));
+        return para;
+    }
+    public Para<String, Double> getParaZCeną() {
+        Para<String, Double> para = new Para(marka, cena);
         return para;
     }
     public Triplet<String, Integer, Double> getTriplet() {
