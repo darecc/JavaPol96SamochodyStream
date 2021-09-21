@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ListaSamochodów {
     public static final int ulubiona = 17;
@@ -134,13 +135,45 @@ public class ListaSamochodów {
         // Ctrl + Alt + T dla uzyskania regionu w rozumieniu C#
 
         //region srednia cena samochodu
+        double averagePrice = samochody.stream()
+                .filter(p->p.getRokProdukcji()>2015)
+                .mapToDouble(p->p.getCena())
+                .average().getAsDouble();
+        System.out.println("Srednia cena samochodow po 2015 roku wynosi " + averagePrice);
+
         //endregion
         //region liczba samochodow z lat 2010-2015 o przebiegu mniejszym niz 20000 km
+        long numberOfCars1 = samochody.stream()
+                .filter(p->p.getRokProdukcji()>=2010 && p.getRokProdukcji()<=2015)
+                .filter(p->p.getPrzebieg() > 20000)
+                .count();
+        System.out.println("Liczba samochodow z lat 2010-2015 z przebiegiem mniejszym niz 20000: " + numberOfCars1);
+
         //endregion
         //region samochody wyprodukowane po 2014 roku posortowane wg ceny
+        List<Samochód> carsList1 = samochody.stream()
+                .filter(p->p.getRokProdukcji()>2014)
+                .sorted((p1,p2)->(int)(p1.getCena() - p2.getCena()))
+                .collect(Collectors.toList());
+        System.out.println("Lista samochodow wyprodukowanych po 2014, posortowana wg ceny: ");
+                for(Samochód s : carsList1){
+                    System.out.println("Marka: " + s.getMarka() + " Cena: " + s.getCena() + " Rok produkcji: " + s.getRokProdukcji());
+                }
 
         //endregion
         //region samochody pogrupowane wg marek a w ramach marki posortowane wg modelu
+        Map<String, List<Samochód>> carList2 = samochody.stream()
+                .sorted((p1, p2)->(p1.getMarka().compareTo(p2.getMarka())))
+                .collect(Collectors.groupingBy(Samochód::getMarka));
+
+        System.out.println("Samochody pogrupowane wg marek i posortowane wg modelu ");
+        for(Map.Entry<String, List<Samochód>> entry:carList2.entrySet()) {
+            System.out.println("Marka: " + entry.getKey());
+            for (Samochód s : entry.getValue()) {
+                System.out.println("\t Model: " + s.getModel());
+            }
+        }
+
         //endregion
         //region obliczenie średniego wieku pojazdów
         //endregion
